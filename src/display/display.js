@@ -1,4 +1,4 @@
-import Player from '../model/player.js';
+import Player from '../model/player.js'; 
 import Ball from '../model/ball.js';
 import Message from '../model/message.js';
 
