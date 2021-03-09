@@ -1,4 +1,5 @@
 import EventHandler from "../event/eventHandler.js";
+import Ball from "../model/ball.js";
 
 const Update = class Update {
 
@@ -7,19 +8,20 @@ const Update = class Update {
     this.display = display;
     this.eventHandler = new EventHandler();
     this.addObservers();
+    
   }
 
   addObservers () {
-    let { balls, ballsOut, players, message, result, gameState } = this.model;
+    const { balls, players, message, result, gameState } = this.model;
     
-    this.addSetAndGet (
+    this.observeProp (
       result, 
       "left", 
       "_left", 
       [ message.update.bind(message) ], 
       []);
 
-    this.addSetAndGet (
+    this.observeProp (
       result, 
       "right",
       "_right", 
@@ -28,22 +30,21 @@ const Update = class Update {
     
     const render = this.display.render.bind(this.display);
 
-    this.addSetAndGet(
+    this.observeProp(
       gameState,
       "value",
       "_value",
-      [...balls.map((ball) => ball.gameStateChange.bind(ball))
-      ],
+      balls.map((ball) => ball.gameStateChange.bind(ball))
+      ,
       []);
     
-    
-    this.addSetAndGet(
+    this.observeProp(
       players[0],
       "y",
       "_y",
       [], [render]);
     
-    this.addSetAndGet(
+    this.observeProp(
       players[1],
       "y",
       "_y",
@@ -51,54 +52,32 @@ const Update = class Update {
     
     balls.forEach(
       ball => {
-        this.addSetAndGet(ball, "x", "_x", [], [render]);
-        this.addSetAndGet(ball, "y", "_y", [], [render]);
-        this.addSetAndGet(
+        this.observeProp(ball, "x", "_x", [], [render]);
+        this.observeProp(ball, "y", "_y", [], [render]);
+        this.observeProp(
           ball, 
           "isOut", 
           "_isOut", 
-          [
-            (ballOut, isOut, value) => {
-              if (!value) return;
-              balls = balls.filter( ball => ball != ballOut );
-              ballsOut.push(ballOut);
-              ballOut.restoreDefault.call(ballOut);
-              
-              if ( ( result.left === 9 & value === "left") 
-                || (result.right === 9 & value === "right") ) {
-                result.update.call(result, "", "restart", "");
-                message.update.call(message, result, value, 10);
-                balls.forEach(ball => ball.isOut = "neither");
-                ballsOut = balls.concat(ballsOut);
-                balls = [];
-              }
-              else result.update.call(result, result, isOut, value);
-              
-              if (balls.length === 0) {
-                gameState.value = "paused";
-                balls = ballsOut.concat();
-                balls.forEach(ball => ball.isOut = false);
-                ballsOut = [];
-                
-                render(balls[0], "isOut", balls[0].isOut);
-              } 
-            }
+          [ 
+            Ball.onBallOut.bind(this)
           ], []);
       }
     );
-    this.addSetAndGet(message, "value", "_value", [], [render]);
-  }    
+    this.observeProp(message, "value", "_value", [], [render]);
+  }
 
-  addSetAndGet (target, name, _private, updateHandlers=[], renderHandlers=[]) {
-    Object.defineProperty(target, name, {
+  observeProp (targetObj, propName, _privatePropName, updateHandlers=[], renderHandlers=[]) {
+    Object.defineProperty(targetObj, propName, {
       get() {
-        return target[_private];
+        return targetObj[_privatePropName];
       },
     
       set(value) {
-        target[_private] = value;
-        updateHandlers.concat(renderHandlers).forEach(handler =>
-          handler(this, name, value)
+        targetObj[_privatePropName] = value;
+        
+        updateHandlers.concat(renderHandlers).forEach(handler => {
+          handler(this, propName, value)
+        }
         );
       }
     })
@@ -135,6 +114,6 @@ const Update = class Update {
       });
     }
   }
-}
+};
 
 export default Update;

@@ -86,6 +86,7 @@ const Display = class Display {
     })
     return result;
   }
+  
   drawBalls(balls) {
     let result = balls.map(ball => {
       let DOMBall = this.createElement("div", {

@@ -151,6 +151,34 @@ const Ball = class Ball {
       * (Math.random() < 0.5 ? -1 : 1)
     );
   }
+
+  static onBallOut (ballOut, isOut, value) {
+    let { balls, ballsOut, message, result, gameState } = this.model;
+    if (!value) return;
+    balls = balls.filter( ball => ball != ballOut );
+    ballsOut.push(ballOut);
+    ballOut.restoreDefault.call(ballOut);
+    
+    if ( ( result.left === 9 & value === "left") 
+      || (result.right === 9 & value === "right") ) {
+      result.update.call(result, "", "restart", "");
+      message.update.call(message, result, value, 10);
+      balls.forEach(ball => ball.isOut = "neither");
+      ballsOut = balls.concat(ballsOut);
+      balls = [];
+    }
+    else result.update.call(result, result, isOut, value);
+    
+    if (balls.length === 0) {
+      gameState.value = "paused";
+      balls = ballsOut.concat();
+      balls.forEach(ball => ball.isOut = false);
+      ballsOut = [];
+      
+
+      this.display.render.call(this.display, balls[0], "isOut", balls[0].isOut);
+    } 
+  }
 };
 
 export default Ball;
