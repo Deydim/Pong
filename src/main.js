@@ -12,7 +12,7 @@ const Game = class Game {
   }
 
   start() {
-    this.update.loop();
+    requestAnimationFrame(this.update.gameLoop.bind(this.update));
   }
 }
 
