@@ -18,15 +18,13 @@ const Update = class Update {
       result, 
       "left", 
       "_left", 
-      [ message.update.bind(message) ], 
-      []);
+       message.update.bind(message) );
 
     this.observeProp (
       result, 
       "right",
       "_right", 
-      [ message.update.bind(message) ], 
-      []);
+       message.update.bind(message) );
     
     const render = this.display.render.bind(this.display);
 
@@ -34,39 +32,29 @@ const Update = class Update {
       gameState,
       "value",
       "_value",
-      balls.map((ball) => ball.gameStateChange.bind(ball))
-      ,
-      []);
+      ...balls.map((ball) => ball.gameStateChange.bind(ball)));
     
-    this.observeProp(
-      players[0],
-      "y",
-      "_y",
-      [], [render]);
-    
-    this.observeProp(
-      players[1],
-      "y",
-      "_y",
-      [], [render]); 
-    
+    players.forEach(
+      player => this.observeProp(player, "y", "_y", render)
+    );
+  
     balls.forEach(
       ball => {
-        this.observeProp(ball, "x", "_x", [], [render]);
-        this.observeProp(ball, "y", "_y", [], [render]);
+        this.observeProp(ball, "x", "_x", render);
+        this.observeProp(ball, "y", "_y", render);
         this.observeProp(
           ball, 
           "isOut", 
           "_isOut", 
-          [ 
-            Ball.onBallOut.bind(this)
-          ], []);
+          Ball.onBallOut.bind(this) 
+        );
       }
     );
-    this.observeProp(message, "value", "_value", [], [render]);
+
+    this.observeProp(message, "value", "_value", render);
   }
 
-  observeProp (targetObj, propName, _privatePropName, updateHandlers=[], renderHandlers=[]) {
+  observeProp (targetObj, propName, _privatePropName, ...handlers) {
     Object.defineProperty(targetObj, propName, {
       get() {
         return targetObj[_privatePropName];
@@ -75,7 +63,7 @@ const Update = class Update {
       set(value) {
         targetObj[_privatePropName] = value;
         
-        updateHandlers.concat(renderHandlers).forEach(handler => {
+        handlers.forEach(handler => {
           handler(this, propName, value)
         }
         );
@@ -83,12 +71,12 @@ const Update = class Update {
     })
   }
 
-  loop(oldTime, time) {
+  gameLoop(oldTime, time) {
     
     oldTime = oldTime || 0;
     time = time || oldTime;
     
-    requestAnimationFrame((time) => this.loop(time, oldTime));
+    requestAnimationFrame((time) => this.gameLoop(time, oldTime));
 
     const leftPlayer = this.model.players.filter(player => player.constants.type === "left")[0],
           rightPlayer = this.model.players.filter(player => player.constants.type === "right")[0],
