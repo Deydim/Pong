@@ -2,6 +2,8 @@ import Model from './model/model.js';
 import Display from './display/display.js';
 import EventHandler from './event/eventHandler.js';
 
+// refactor branch
+
 const Game = class Game {
   constructor() {
     this.model = new Model();
