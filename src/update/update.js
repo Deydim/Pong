@@ -1,5 +1,6 @@
 import EventHandler from "../event/eventHandler.js";
 import Ball from "../model/ball.js";
+import Game from "../main.js";
 
 const Update = class Update {
 
@@ -76,12 +77,15 @@ const Update = class Update {
     oldTime = oldTime || 0;
     time = time || oldTime;
     
-    requestAnimationFrame((time) => this.gameLoop(time, oldTime));
+    const timer = requestAnimationFrame((time) => this.gameLoop(time, oldTime));
 
     const leftPlayer = this.model.players.filter(player => player.constants.type === "left")[0],
           rightPlayer = this.model.players.filter(player => player.constants.type === "right")[0],
           keyState  = this.eventHandler;
-
+    if(keyState.renderButtonClicked) {
+      cancelAnimationFrame(timer);
+      return new Game();
+    }
     if (this.model.balls[0].hitY < leftPlayer.centerY) leftPlayer.move(-4);
     if (this.model.balls[0].hitY > leftPlayer.centerY) leftPlayer.move(4);
     // if (keyState.KeyA ) leftPlayer.move(-6);
@@ -96,11 +100,8 @@ const Update = class Update {
         this.model.message.update(this.model.result);
     }
     const progress = (oldTime - time) / 15;
-    if (this.model.gameState.value === "playing" && progress < 2) {;
-      this.model.balls.forEach( ball => {
-        if (!ball.isOut) ball.move(progress);
-      });
-    }
+    if (this.model.gameState.value === "playing" && progress < 2)
+      this.model.balls.forEach( ball => ball.move(progress));
   }
 };
 

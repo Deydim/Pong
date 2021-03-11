@@ -3,21 +3,23 @@ import Ball from '../model/ball.js';
 import Message from '../model/message.js';
 
 const Display = class Display {
-  constructor(gameModel) {
+  constructor(model) {
+    this.parentElement = model.parentElement;
     this.clear();
-    this.offsetLeft = gameModel.field.left;
-    this.offsetTop = gameModel.field.top;
-    this.field = this.drawField(gameModel.field);
-    this.balls = this.drawBalls(gameModel.balls);
-    this.players = this.drawPlayers(gameModel.players);
-    this.message = this.displayMessage(gameModel.field, gameModel.message.value);
+    this.offsetLeft = model.field.left;
+    this.offsetTop = model.field.top;
+    this.field = this.drawField(model.field);
+    this.balls = this.drawBalls(model.balls);
+    this.players = this.drawPlayers(model.players);
+    this.message = this.displayMessage(model.field, model.message.value);
     this.rightPlayer = this.players[1];
     this.leftPlayer = this.players[0];
+    
   }
 
   clear () {
     Array
-    .from(document.body.childNodes)
+    .from(this.parentElement.childNodes)
     .forEach(node => node.remove());
   }
 
@@ -34,10 +36,21 @@ const Display = class Display {
         }
         break;
       case target instanceof Ball:
-        if (target.isOut && this.balls[target.index].style.display !== "none")
+        if (value === "invisible") {
           this.balls[target.index].style.display = "none";
-        if (!target.isOut && this.balls[target.index].style.display === "none")
+          return;
+        }
+        if (value === "neither") {
           this.balls[target.index].style.display = "";
+          return;
+        }
+        
+        // if (target.isOut === "neither" && this.balls[target.index].style.display !== "")
+        //   {console.log("set display visible");
+        //   this.balls[target.index].style.display = "";}
+        // if (!target.isOut !== "neither" && this.balls[target.index].style.display === "")
+        //   {console.log("set display invisible");
+        //   this.balls[target.index].style.display = "none";}
 
         switch (name) {
           case "y":
@@ -67,7 +80,7 @@ const Display = class Display {
       width: `${field.width}px`,
       height: `${field.height}px`
       })
-    document.body.appendChild(DOMField);  
+      this.parentElement.appendChild(DOMField);  
     return DOMField;
   }
   
@@ -81,7 +94,7 @@ const Display = class Display {
         width: `${player.constants.width}px`,
         height: `${player.constants.height}px`,
       })
-      document.body.appendChild(DOMPlayer);
+      this.parentElement.appendChild(DOMPlayer);
       return DOMPlayer; 
     })
     return result;
@@ -98,7 +111,7 @@ const Display = class Display {
         height: `${ball.constants.size}px`,
         borderRadius: `${ball.constants.size/2}px`
       })
-      document.body.appendChild(DOMBall);
+      this.parentElement.appendChild(DOMBall);
       return DOMBall; 
     })
     return result;
@@ -114,7 +127,7 @@ const Display = class Display {
       fontSize: `${fieldSize * 7}px`
     });
     DOMMessage.innerHTML = message;
-    document.body.appendChild(DOMMessage);
+    this.parentElement.appendChild(DOMMessage);
     return DOMMessage;
   }
 
