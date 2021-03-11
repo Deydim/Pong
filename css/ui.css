@@ -191,3 +191,10 @@ button:focus {
 button:active {
   color:rgb(227, 255, 198);
 }
+
+.configContainer {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 200px;
+}

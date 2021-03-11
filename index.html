@@ -4,11 +4,74 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Pong</title>
-  <link rel="stylesheet" href="https://assets.uits.iu.edu/css/rivet/1.8.0/rivet.min.css">
   <link rel="stylesheet" href="css/style.css">
   <script type="module" src="src/main.js"></script>
 </head>
 <body>
-  <script src="https://assets.uits.iu.edu/javascript/rivet/1.8.0/rivet.min.js"></script>
+  <div class="configContainer">
+    <fieldset>
+      <legend>Configuration</legend>
+      <table>
+          <tr>
+            <td>Field size</td>
+          </tr>
+          <tr>
+            <td>
+              <form id="formFieldSize" oninput="outputFieldSize.value=parseInt(inputFieldSize.value)">
+                <input form="formFieldSize" id="inputFieldSize" type="range" min="10" max="40" value="20"></input>
+              </form>
+            </td>
+            <td>  
+              <output form="formFieldSize" id="outputFieldSize">20</output>
+            </td>
+          </tr>
+          <tr>
+            <td>Player size</td>
+          </tr>
+          <tr>
+            <td>
+              <form id="formPlayerSize" oninput="outputPlayerSize.value=parseInt(inputPlayerSize.value)">
+                <input id="inputPlayerSize" type="range" min="6" max="20" value = "10"></input>
+              </form>
+            </td>
+            <td>  
+              <output form="formPlayerSize" id="outputPlayerSize">10</output>
+            </td>
+          </tr>
+          <tr>
+            <td>Ball size</td>
+          </tr>
+          <tr>
+            <td>
+              <form id="formBallSize" oninput="outputBallSize.value=parseInt(inputBallSize.value)">
+                <input id="inputBallSize" type="range" min="6" max="30" value="16"></input>
+              </form>
+            </td>
+            <td>
+              <output form="formBallSize" id="outputBallSize">16</output>
+            </td>
+          </tr>
+          <tr>
+            <td>Ball count</td>
+          </tr>
+          <tr>
+            <td>
+              <form id="formBallCount" oninput="outputBallCount.value=parseInt(inputBallCount.value)">
+                <input id="inputBallCount" type="range" min="1" max="10" value="1" ></input>
+              </form>
+            </td>
+            <td>  
+              <output form="formBallCount" id="outputBallCount">1</output>
+            </td>
+          </tr>
+          <tr>
+            <td span=2 height=50>
+                <button id="renderButton">Render</button>
+            </td>
+          </tr>
+      </table>
+    </fieldset>
+  </div>
+<div id="gameDiv"></div>
 </body>
 </html>

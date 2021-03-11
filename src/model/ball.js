@@ -105,6 +105,7 @@ const Ball = class Ball {
       return true;
     else return false;
   }
+  
   restoreDefault () {
     const { field, size } = this.constants;
     this.x = field.width / 2 - size / 2;
@@ -125,6 +126,7 @@ const Ball = class Ball {
 
     }
   }
+  
   collideWithFloorCeiling () {
     this.up = -this.up;  
   }
@@ -154,29 +156,31 @@ const Ball = class Ball {
 
   static onBallOut (ballOut, isOut, value) {
     let { balls, ballsOut, message, result, gameState } = this.model;
-    if (!value) return;
-    balls = balls.filter( ball => ball != ballOut );
-    ballsOut.push(ballOut);
-    ballOut.restoreDefault.call(ballOut);
+    if (value === "neither") return;
+    this.model.ballsOut.push(ballOut);
+    this.model.balls = this.model.balls.filter(ball => ball !== ballOut);
+    this.display.render.call(this.display, ballOut, "_", "invisible");
+    ballOut.restoreDefault.call(ballOut);    
     
     if ( ( result.left === 9 & value === "left") 
       || (result.right === 9 & value === "right") ) {
+      this.model.gameState.value === "paused";
+      this.model.ballsOut = this.model.balls.concat(this.model.ballsOut);
+      this.model.balls.forEach(ball => ball.restoreDefault.call(ball));
+      this.model.balls = [];
       result.update.call(result, "", "restart", "");
       message.update.call(message, result, value, 10);
-      balls.forEach(ball => ball.isOut = "neither");
-      ballsOut = balls.concat(ballsOut);
-      balls = [];
     }
     else result.update.call(result, result, isOut, value);
     
-    if (balls.length === 0) {
+    if (this.model.balls.length === 0) {
       gameState.value = "paused";
-      balls = ballsOut.concat();
-      balls.forEach(ball => ball.isOut = false);
-      ballsOut = [];
-      
-
-      this.display.render.call(this.display, balls[0], "isOut", balls[0].isOut);
+      this.model.balls = this.model.ballsOut.concat();
+      this.model.balls.forEach(ball => ball.isOut = "neither");
+      this.model.ballsOut = [];
+      this.model.balls.forEach( ball =>
+        this.display.render.call(this.display, ball, "_", "neither")
+      );
     } 
   }
 };
